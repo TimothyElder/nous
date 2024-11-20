@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import fetch from 'node-fetch';
-const OPENAI_API_KEY = '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'; // Replace this with your actual API key
+
 async function checkSpellingAndGrammar(text) {
     try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {

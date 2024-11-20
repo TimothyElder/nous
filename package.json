@@ -6,10 +6,16 @@
   "engines": {
     "vscode": "^1.93.0"
   },
-  "categories": [
-    "Other"
+  "activationEvents": [
+    "onCommand:nous.helloWorld",
+    "onCommand:nous.removeNewlines",
+    "onCommand:nous.Anonymize",
+    "onCommand:nous.compileMarkdown",
+    "onCommand:nous.testApiConnection",
+    "onCommand:nous.identifyErrors",
+    "onCommand:nous.acceptCorrection",
+    "onCommand:nous.rejectCorrection"
   ],
-  "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -19,20 +25,39 @@
       },
       {
         "command": "nous.removeNewlines",
-        "title": "Nous: Remove Newlines in Selection"
+        "title": "Remove Newlines in Selection"
       },
       {
         "command": "nous.Anonymize",
-        "title": "Nous: Replace text with undesrcores"
+        "title": "Replace Text with Underscores"
       },
       {
         "command": "nous.compileMarkdown",
-        "title": "Nous: Compile Markdown with Template"
+        "title": "Compile Markdown with Template"
       },
       {
         "command": "nous.testApiConnection",
-        "title": "Nous: Test API Connection"
-    }
+        "title": "Test API Connection"
+      },
+      {
+        "command": "nous.identifyErrors",
+        "title": "Identify Spelling and Grammar Errors"
+      },
+      {
+        "command": "nous.acceptCorrection",
+        "title": "Accept Correction"
+      },
+      {
+        "command": "nous.rejectCorrection",
+        "title": "Reject Suggestion"
+      }
+    ],
+    "languages": [
+      {
+        "id": "plaintext",
+        "aliases": ["Plain Text"],
+        "extensions": [".txt", ".md"]
+      }
     ]
   },
   "scripts": {
@@ -44,18 +69,14 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.7",
-    "@types/node": "20.x",
+    "@types/node": "14.x",
+    "@types/node-fetch": "^2.6.12",
     "@types/vscode": "^1.93.0",
-    "@typescript-eslint/eslint-plugin": "^8.3.0",
-    "@typescript-eslint/parser": "^8.3.0",
-    "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1",
-    "eslint": "^9.9.1",
-    "typescript": "^5.5.4"
+    "typescript": "^4.5.4",
+    "eslint": "^8.5.0"
   },
   "dependencies": {
-    "node-fetch": "^3.3.2",
-    "openai": "^4.72.0"
+    "node-fetch": "^3.0.0",
+    "openai": "^4.7.0"
   }
 }
