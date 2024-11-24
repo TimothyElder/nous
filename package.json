@@ -6,6 +6,9 @@
   "engines": {
     "vscode": "^1.93.0"
   },
+  "resolutions": {
+    "node-fetch": "^3.3.2" 
+  },
   "activationEvents": [
     "onCommand:nous.helloWorld",
     "onCommand:nous.removeNewlines",
@@ -18,6 +21,16 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "Nous",
+      "properties": {
+        "nous.openaiAPIkey": {
+          "type": "string",
+          "default": "",
+          "description": "Your OpenAI API key for making requests. This is required for Nous to work."
+        }
+      }
+    },
     "commands": [
       {
         "command": "nous.helloWorld",
@@ -50,13 +63,26 @@
       {
         "command": "nous.rejectCorrection",
         "title": "Reject Suggestion"
-      }
+      },
+      {
+        "command": "nous.setApiKey",
+        "title": "Nous: Set OpenAI API Key"
+    },
+    {
+        "command": "nous.clearApiKey",
+        "title": "Nous: Clear OpenAI API Key"
+    }
     ],
     "languages": [
       {
         "id": "plaintext",
-        "aliases": ["Plain Text"],
-        "extensions": [".txt", ".md"]
+        "aliases": [
+          "Plain Text"
+        ],
+        "extensions": [
+          ".txt",
+          ".md"
+        ]
       }
     ]
   },
@@ -69,14 +95,17 @@
     "test": "vscode-test"
   },
   "devDependencies": {
+    "@types/mocha": "^10.0.10",
     "@types/node": "14.x",
     "@types/node-fetch": "^2.6.12",
     "@types/vscode": "^1.93.0",
-    "typescript": "^4.5.4",
-    "eslint": "^8.5.0"
+    "asynckit": "^0.4.0",
+    "eslint": "^8.5.0",
+    "typescript": "^4.5.4"
   },
   "dependencies": {
-    "node-fetch": "^3.0.0",
-    "openai": "^4.7.0"
+    "node-fetch": "^2.7.0",
+    "openai": "^4.73.0",
+    "whatwg-url": "^14.0.0"
   }
 }

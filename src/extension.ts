@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import * as child_process from 'child_process';
 import * as path from 'path';
 import { testApiConnection, identifySpellingGrammarErrors } from './utils/apiHandler';
+import { setApiKeyCommand, clearApiKeyCommand } from './utils/keyHandler';
+import { removeNewlinesCommand, anonymizeCommand, compileMarkdownCommand } from './utils/plaintextHelpers';
 
 // Store error ranges globally for access across commands
 const errorRanges: { range: vscode.Range; correction: string; decorationType: vscode.TextEditorDecorationType }[] = [];
@@ -14,37 +16,6 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage("I'm Nous! Here to help you.");
     });
 
-    const removeNewlinesCommand = vscode.commands.registerCommand('nous.removeNewlines', () => {
-        const editor = vscode.window.activeTextEditor;
-        if (editor) {
-            const document = editor.document;
-            const selection = editor.selection;
-            const selectedText = document.getText(selection);
-            const processedText = selectedText.replace(/\n/g, ' ');
-            editor.edit(editBuilder => editBuilder.replace(selection, processedText));
-        }
-    });
-
-    const anonymizeCommand = vscode.commands.registerCommand('nous.Anonymize', () => {
-        const editor = vscode.window.activeTextEditor;
-        if (editor) {
-            const document = editor.document;
-            const selection = editor.selection;
-            const selectedText = document.getText(selection);
-            const processedText = selectedText.replace(/./g, '_');
-            editor.edit(editBuilder => editBuilder.replace(selection, processedText));
-        }
-    });
-
-    const compileMarkdownCommand = vscode.commands.registerCommand('nous.compileMarkdown', async () => {
-        // Compilation logic here
-    });
-
-    const testApiCommand = vscode.commands.registerCommand('nous.testApiConnection', async () => {
-        vscode.window.showInformationMessage('Testing API connection...');
-        await testApiConnection();
-    });
-
     // Command to identify spelling and grammar errors
     const identifyErrorsCommand = vscode.commands.registerCommand('nous.identifyErrors', async () => {
         const editor = vscode.window.activeTextEditor;
@@ -52,48 +23,62 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showErrorMessage('No active editor found.');
             return;
         }
-
+    
         const selection = editor.selection;
         const selectedText = editor.document.getText(selection);
-
+    
         if (!selectedText) {
             vscode.window.showErrorMessage('No text selected.');
             return;
         }
-
+    
         vscode.window.showInformationMessage('Identifying spelling and grammar errors...');
         const errors = await identifySpellingGrammarErrors(selectedText);
-
+    
         if (errors && Array.isArray(errors)) {
-            // Set up decoration styles
+            // Clear previous decorations
             const spellingErrorDecoration = vscode.window.createTextEditorDecorationType({ textDecoration: 'underline wavy red' });
             const grammarErrorDecoration = vscode.window.createTextEditorDecorationType({ textDecoration: 'underline wavy green' });
-
+    
             const spellingDecorations: vscode.DecorationOptions[] = [];
             const grammarDecorations: vscode.DecorationOptions[] = [];
-            errorRanges.length = 0;  // Clear previous errors
-
+            errorRanges.length = 0; // Reset stored errors
+    
             for (const error of errors) {
-                const errorText = error.error;
-                const correction = error.correction;
-                const startPosition = error.position;
-                const start = editor.document.positionAt(selection.start.character + startPosition);
-                const end = editor.document.positionAt(start.character + errorText.length);
+                
+                const start = editor.document.positionAt(selection.start.character + error.start_position);
+                console.log('Start Position Object:', start);
+                
+                const end = editor.document.positionAt(selection.start.character + error.end_position);
+                console.log('End Position Object:', end);
+                
                 const range = new vscode.Range(start, end);
+                console.log('Range of Position Object:', range);
+    
+                // Extract error text and correction
+                const errorText = error.error;          // Text with the error
+                console.log('Error text:', errorText);
+                
+                const errorCorrection = error.correction; // Suggested correction
+                console.log('Error correction:', errorCorrection);
 
-                const decoration: vscode.DecorationOptions = { range, hoverMessage: `Correction: ${correction}` };
+                const decoration: vscode.DecorationOptions = {
+                    range,
+                    hoverMessage: `Error: "${errorText}"\nCorrection: "${errorCorrection}"`,
+                };
+    
                 if (error.type === 'spelling') {
                     spellingDecorations.push(decoration);
-                    errorRanges.push({ range, correction, decorationType: spellingErrorDecoration });
+                    errorRanges.push({ range, correction: errorCorrection, decorationType: spellingErrorDecoration });
                 } else if (error.type === 'grammar') {
                     grammarDecorations.push(decoration);
-                    errorRanges.push({ range, correction, decorationType: grammarErrorDecoration });
+                    errorRanges.push({ range, correction: errorCorrection, decorationType: grammarErrorDecoration });
                 }
             }
-
+    
             editor.setDecorations(spellingErrorDecoration, spellingDecorations);
             editor.setDecorations(grammarErrorDecoration, grammarDecorations);
-
+    
             vscode.window.showInformationMessage("Spelling and grammar check completed. Hover over errors to see suggestions.");
         } else {
             vscode.window.showInformationMessage("No errors found or failed to retrieve errors.");
@@ -154,7 +139,21 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    context.subscriptions.push(helloWorldCommand, removeNewlinesCommand, anonymizeCommand, compileMarkdownCommand, testApiCommand, identifyErrorsCommand, acceptCorrectionCommand, rejectCorrectionCommand);
+    context.subscriptions.push(helloWorldCommand, removeNewlinesCommand, anonymizeCommand, compileMarkdownCommand,
+                               identifyErrorsCommand, acceptCorrectionCommand, rejectCorrectionCommand);
+    
+    context.subscriptions.push(
+        vscode.commands.registerCommand('nous.setApiKey', () => setApiKeyCommand(context))
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('nous.clearApiKey', () => clearApiKeyCommand(context))
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand('nous.testApiConnection', async () => {
+            await testApiConnection(context); // Pass context here
+        })
+    );
 }
 
 export function deactivate() {}

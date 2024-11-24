@@ -1,0 +1,14 @@
+{
+  "contributes": {
+    "configuration": {
+      "title": "Nous",
+      "properties": {
+        "nous.openaiAPIkey": {
+          "type": "string",
+          "default": null,
+          "description": "Your OpenAI API key for making requests."
+        }
+      }
+    }
+  }
+}
