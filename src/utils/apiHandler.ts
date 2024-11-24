@@ -1,19 +1,41 @@
 import * as vscode from 'vscode';
+import { getApiKey } from './keyHandler';
+
+interface OpenAIResponse {
+    choices: {
+        message: {
+            content: string;
+        };
+    }[];
+}
+
+interface ApiError {
+    message: string;
+    code?: number; // Optional field for status codes
+}
 
 // Test API connection with display message
-
-export async function testApiConnection(): Promise<void> {
+export async function testApiConnection(context: vscode.ExtensionContext): Promise<void> {
     try {
+        // Retrieve the API key from SecretStorage
+        const apiKey = await getApiKey(context);
+
+        if (!apiKey) {
+            vscode.window.showErrorMessage(
+                'No OpenAI API key found. Please set it using the "Nous: Set API Key" command.'
+            );
+            return;
+        }
         const fetch = (await import("node-fetch")).default;
 
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: 'gpt-3.5-turbo', // or 'gpt-4'
+                model: 'gpt-3.5-turbo',
                 messages: [
                     { role: 'system', content: "You are an assistant." },
                     { role: 'user', content: "Hello, can you confirm our connection?" },
@@ -29,13 +51,13 @@ export async function testApiConnection(): Promise<void> {
             return;
         }
 
-        const data = await response.json();
+        const data = await response.json() as OpenAIResponse
         const reply = data.choices[0].message.content.trim();
 
-        // Display the response in a pop-up message
         vscode.window.showInformationMessage(`API Response: ${reply}`);
-    } catch (error) {
-        vscode.window.showErrorMessage(`Error calling OpenAI API: ${error.message}`);
+    } catch (error: unknown) {
+        const apiError = error as ApiError;
+        vscode.window.showErrorMessage(`Error calling OpenAI API: ${apiError.message}`);
     }
 }
 
@@ -54,7 +76,25 @@ export async function identifySpellingGrammarErrors(text: string): Promise<any |
                 model: 'gpt-4', // or 'gpt-3.5-turbo'
                 messages: [
                     { role: 'system', content: "You are an assistant that identifies spelling and grammar errors." },
-                    { role: 'user', content: `Identify spelling and grammar errors in the following text, and return them in JSON format with the structure: [{"error": "error text", "correction": "corrected text", "type": "spelling/grammar", "position": start_position}]. Text:\n\n${text}` },
+                    { 
+                        role: 'user', 
+                        content: `
+                            Identify spelling and grammar errors in the following text. 
+                            Return them in JSON format with the structure: 
+                            [
+                                {
+                                    "error": "error text", 
+                                    "correction": "corrected text", 
+                                    "type": "spelling/grammar", 
+                                    "start_position": start_index, 
+                                    "end_position": end_index
+                                }
+                            ]. 
+                            The start_position and end_position must represent character indices in the given text. Text:
+                            
+                            ${text}
+                        `
+                    },
                 ],
                 max_tokens: 500,
                 temperature: 0.2,
@@ -70,7 +110,7 @@ export async function identifySpellingGrammarErrors(text: string): Promise<any |
         const data = await response.json();
         const errors = data.choices[0].message.content.trim();
 
-        // Parse JSON response from the API (if the response format is correct)
+        // Parse JSON response from the API
         try {
             const errorList = JSON.parse(errors);
             return errorList;
@@ -80,6 +120,6 @@ export async function identifySpellingGrammarErrors(text: string): Promise<any |
             return;
         }
     } catch (error) {
-        vscode.window.showErrorMessage(`Error calling OpenAI API: ${error.message}`);
+        vscode.window.showErrorMessage(`Error calling OpenAI API: ${(error as Error).message}`);
     }
 }
