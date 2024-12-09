@@ -1,0 +1,9 @@
+[
+    {
+        "scope": "comment.block.curlybrackets",
+        "settings": {
+            "foreground": "#ADD8E6",
+            "fontStyle": "italic"
+        }
+    }
+]

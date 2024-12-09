@@ -75,7 +75,15 @@ export async function identifySpellingGrammarErrors(text: string): Promise<any |
             body: JSON.stringify({
                 model: 'gpt-4', // or 'gpt-3.5-turbo'
                 messages: [
-                    { role: 'system', content: "You are an assistant that identifies spelling and grammar errors." },
+                    { role: 'system', content: `You are an assistant that identifies spelling and grammar errors.
+                        Instructions for indexing:
+                        1. The position is zero-based, with position 0 corresponding to the start of the first character of the text.
+                        2. Position 1 corresponds to the space between the first and second characters, and so on.
+                        3. The start_position is the index immediately before the first character of the error.
+                        4. The end_position is the index immediately after the last character of the error.
+
+                        For example, if the text is "The cat sat on the mat." your response would identify the error between 8 and 11 because the count is "(0)T(1)h(2)e(3) (4)c(5)a(6)t(7) (8)s(9)a(10)t(11) on the mat.
+                        ` },
                     { 
                         role: 'user', 
                         content: `
@@ -90,7 +98,8 @@ export async function identifySpellingGrammarErrors(text: string): Promise<any |
                                     "end_position": end_index
                                 }
                             ]. 
-                            The start_position and end_position must represent character indices in the given text. Text:
+                            
+                            Text:
                             
                             ${text}
                         `

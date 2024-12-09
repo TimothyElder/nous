@@ -4,10 +4,10 @@
   "description": "A companion for writers and researchers using plaintext files.",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.93.0"
+    "vscode": "^1.95.0"
   },
   "resolutions": {
-    "node-fetch": "^3.3.2" 
+    "node-fetch": "^3.3.2"
   },
   "activationEvents": [
     "onCommand:nous.helloWorld",
@@ -28,6 +28,41 @@
           "type": "string",
           "default": "",
           "description": "Your OpenAI API key for making requests. This is required for Nous to work."
+        }
+      }
+    },
+    "grammars": [
+      {
+        "language": "markdown",
+        "scopeName": "text.html.markdown",
+        "path": "./syntaxes/markdown.tmLanguage.json"
+      }
+    ],
+    "languages": [
+      {
+        "id": "markdown",
+        "aliases": [
+          "Markdown",
+          "markdown"
+        ],
+        "extensions": [
+          ".md"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "configurationDefaults": {
+      "[markdown]": {
+        "editor.tokenColorCustomizations": {
+          "textMateRules": [
+            {
+              "scope": "comment.block.curlybrackets",
+              "settings": {
+                "foreground": "#ADD8E6",
+                "fontStyle": "italic"
+              }
+            }
+          ]
         }
       }
     },
@@ -67,22 +102,10 @@
       {
         "command": "nous.setApiKey",
         "title": "Nous: Set OpenAI API Key"
-    },
-    {
+      },
+      {
         "command": "nous.clearApiKey",
         "title": "Nous: Clear OpenAI API Key"
-    }
-    ],
-    "languages": [
-      {
-        "id": "plaintext",
-        "aliases": [
-          "Plain Text"
-        ],
-        "extensions": [
-          ".txt",
-          ".md"
-        ]
       }
     ]
   },
@@ -98,7 +121,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "14.x",
     "@types/node-fetch": "^2.6.12",
-    "@types/vscode": "^1.93.0",
+    "@types/vscode": "^1.95.0",
     "asynckit": "^0.4.0",
     "eslint": "^8.5.0",
     "typescript": "^4.5.4"
