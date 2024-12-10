@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
     
         vscode.window.showInformationMessage('Identifying spelling and grammar errors...');
-        const errors = await identifySpellingGrammarErrors(selectedText);
+        const errors = await identifySpellingGrammarErrors(selectedText, context);
     
         if (errors && Array.isArray(errors)) {
             // Clear previous decorations

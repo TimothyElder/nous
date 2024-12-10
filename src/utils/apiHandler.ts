@@ -62,14 +62,25 @@ export async function testApiConnection(context: vscode.ExtensionContext): Promi
 }
 
 // Check Grammar Function 
-export async function identifySpellingGrammarErrors(text: string): Promise<any | undefined> {
+export async function identifySpellingGrammarErrors(text: string, context: vscode.ExtensionContext): Promise<any | undefined> {
+    
     try {
+        // Retrieve the API key from SecretStorage
+        const apiKey = await getApiKey(context);
+
+        if (!apiKey) {
+            vscode.window.showErrorMessage(
+                'No OpenAI API key found. Please set it using the "Nous: Set API Key" command.'
+            );
+            return;
+        }
+
         const fetch = (await import("node-fetch")).default;
 
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
@@ -82,7 +93,7 @@ export async function identifySpellingGrammarErrors(text: string): Promise<any |
                         3. The start_position is the index immediately before the first character of the error.
                         4. The end_position is the index immediately after the last character of the error.
 
-                        For example, if the text is "The cat sat on the mat." your response would identify the error between 8 and 11 because the count is "(0)T(1)h(2)e(3) (4)c(5)a(6)t(7) (8)s(9)a(10)t(11) on the mat.
+                        For example, if the text is "The cat set on the mat." your response would identify the error between 8 and 11 because the count is "(0)T(1)h(2)e(3) (4)c(5)a(6)t(7) (8)s(9)a(10)t(11) on the mat.
                         ` },
                     { 
                         role: 'user', 
