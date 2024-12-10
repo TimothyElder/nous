@@ -1,6 +1,6 @@
 # nous
 
-Nous is for researchers and writers who are doing their work using plain text files. These include Markdown, LaTeX, RMarkdown, sweave and many more. Nous is meant to make your life easier by including compilation settings for pandoc and its extensions natively, so you don't have to go through the unfortunate process your self of setting up make files or working on the command line when you are writing and compiling. 
+Nous is for researchers and writers who are doing their work using plain text files. These include Markdown, $\LaTeX$, RMarkdown, sweave and many more. Nous is meant to make your life easier by including compilation settings for pandoc and its extensions natively, so you don't have to go through the unfortunate process your self of setting up make files or working on the command line when you are writing and compiling. 
 
 Most importantly Nous includes a grammar and spell checker to help make your work more better! Using the OpenAI API for completions from their GPT models it will help to fix spelling and grammatical errors.
 
@@ -18,5 +18,9 @@ Dr. Potter, a palliative care attending in the Midwest descibes that:
 
 Nous also comes with a compilation toolchain for markdown documents that will help you speed up compilation of documents.
 
-## Grammar Checking with OpenAI models
+## Grammar Checking with OpenAI Completion Models
+
+**In Development. Not Functional**
+
+The grammar and spell checking feature of Nous uses OpenAI's completion models for feedback. You'll need an API key to OpenAI's which can securely entered into Nous's options through the command palette with the command `Nous: Set API key`. The grammar and spell checker is currently designed only for use with markdown files but will be developed to include plain text documents including $\LaTeX$, RMarkdown, etc.. 
 
