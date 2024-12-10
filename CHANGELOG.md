@@ -30,3 +30,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### Known Issues
 - Grammar checker can still struggle with edge cases in text detection.
 - Error ranges may shift slightly if multiple corrections are applied out of order.
+
+## [0.1.1] - 2024-12-10
+
+### Bug Fixes
+- Resolved indexing issue for grammar/spell checker: indexing begins at the start of document rather than start of selection. 
