@@ -82,7 +82,7 @@
         "title": "Remove Newlines in Selection"
       },
       {
-        "command": "nous.Anonymize",
+        "command": "nous.anonymizeCommand",
         "title": "Replace Text with Underscores"
       },
       {
