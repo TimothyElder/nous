@@ -78,12 +78,12 @@
         "title": "Remove Newlines in Selection"
       },
       {
-        "command": "nous.anonymizeCommand",
+        "command": "nous.Anonymize",
         "title": "Replace Text with Underscores"
       },
       {
         "command": "nous.compileMarkdown",
-        "title": "Compile Markdown with Template"
+        "title": "Compile Markdown"
       },
       {
         "command": "nous.testApiConnection",

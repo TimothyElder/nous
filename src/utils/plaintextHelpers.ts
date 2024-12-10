@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
 import * as child_process from 'child_process';
+import * as os from 'os';
+import * as path from 'path';
+import * as fs from 'fs';
+import { preprocessMarkdown, removeCurlyBracketComments } from './preprocessor';
 
 export const removeNewlinesCommand = vscode.commands.registerCommand('nous.removeNewlines', () => {
     const editor = vscode.window.activeTextEditor;
@@ -18,7 +22,7 @@ export const anonymizeCommand = vscode.commands.registerCommand('nous.Anonymize'
         const document = editor.document;
         const selection = editor.selection;
         const selectedText = document.getText(selection);
-        const processedText = selectedText.replace(/./g, '_');
+        const processedText = selectedText.replace(/\w/g, '_');
         editor.edit(editBuilder => editBuilder.replace(selection, processedText));
     }
 });
@@ -33,7 +37,7 @@ export const compileMarkdownCommand = vscode.commands.registerCommand('nous.comp
     }
 
     const document = editor.document;
-    console.log("Document languageID:", document.languageId)
+    console.log("Document languageID:", document.languageId);
     if (document.languageId !== 'markdown' && document.languageId !== 'md') {
         vscode.window.showErrorMessage('The current file is not a Markdown file.');
         return;
@@ -65,16 +69,24 @@ export const compileMarkdownCommand = vscode.commands.registerCommand('nous.comp
 
     const outputPath = saveUri.fsPath;
 
+    // Preprocess Markdown content
+    const originalContent = document.getText();
+    const preprocessedContent = removeCurlyBracketComments(preprocessMarkdown(originalContent));
+
+    // Write preprocessed content to a temporary file
+    const tempFilePath = path.join(os.tmpdir(), 'preprocessed.md');
+    fs.writeFileSync(tempFilePath, preprocessedContent);
+
     // Run Pandoc command
-    const inputPath = document.uri.fsPath;
-    const command = `pandoc "${inputPath}" -o "${outputPath}"`;
+    const command = `pandoc -r markdown+simple_tables+table_captions+yaml_metadata_block+smart -s --pdf-engine=xelatex --filter pandoc-xnos --citeproc ${tempFilePath} -o ${outputPath}`;
 
     vscode.window.showInformationMessage(`Compiling Markdown to ${selectedFormat}...`);
     child_process.exec(command, (error, stdout, stderr) => {
         if (error) {
             vscode.window.showErrorMessage(`Error during compilation: ${stderr}`);
+            console.error(error);
             return;
         }
         vscode.window.showInformationMessage(`Markdown compiled successfully to ${outputPath}`);
     });
-})
+});

@@ -141,7 +141,7 @@ export function activate(context: vscode.ExtensionContext) {
                 errorRanges.splice(errorIndex, 1);
             }
     
-            // Adjust ranges for remaining errors
+            // Adjusts ranges for when correction accepted, otherwise the error ranges for later corrections will be off.
             errorRanges.forEach(err => {
                 if (err.range.start.isAfter(range.end)) {
                     // Adjust ranges that are after the edited range
@@ -155,7 +155,7 @@ export function activate(context: vscode.ExtensionContext) {
             // Remove the decoration for the corrected error
             editor.setDecorations(decorationType, errorRanges.map(e => ({ range: e.range })));
     
-            vscode.window.showInformationMessage(`Correction applied: ${correction}`);
+            // vscode.window.showInformationMessage(`Correction applied: ${correction}`);
         }
     });
     
