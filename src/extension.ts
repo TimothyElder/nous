@@ -44,27 +44,28 @@ export function activate(context: vscode.ExtensionContext) {
             const grammarDecorations: vscode.DecorationOptions[] = [];
             errorRanges.length = 0; // Reset stored errors
     
-            let startSearch = 0; // Tracks where to start searching in the text for string matches
+            // Get the start offset of the selection in the entire document
+            const selectionStartOffset = editor.document.offsetAt(selection.start);
     
             for (const error of errors) {
-                const errorText = error.error;          // Text with the error
+                const errorText = error.error; // Text with the error
                 const errorCorrection = error.correction; // Suggested correction
     
                 // Find the position of the error text in the selected text
-                const startOffset = selectedText.indexOf(errorText, startSearch);
-                if (startOffset === -1) {
+                const startOffsetInSelection = selectedText.indexOf(errorText);
+                if (startOffsetInSelection === -1) {
                     console.warn(`Error text not found in selection: ${errorText}`);
                     continue; // Skip if the error text cannot be found
                 }
     
-                // Calculate the range for the error
-                const endOffset = startOffset + errorText.length;
-                const start = editor.document.positionAt(selection.start.character + startOffset);
-                const end = editor.document.positionAt(selection.start.character + endOffset);
-                const range = new vscode.Range(start, end);
+                // Adjust offsets to align with the full document
+                const startOffsetInDocument = selectionStartOffset + startOffsetInSelection;
+                const endOffsetInDocument = startOffsetInDocument + errorText.length;
     
-                // Update startSearch to avoid matching the same occurrence multiple times
-                startSearch = endOffset;
+                // Calculate the range for the error in the document
+                const start = editor.document.positionAt(startOffsetInDocument);
+                const end = editor.document.positionAt(endOffsetInDocument);
+                const range = new vscode.Range(start, end);
     
                 // Create decoration for this error
                 const decoration: vscode.DecorationOptions = {
@@ -90,6 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showInformationMessage("No errors found or failed to retrieve errors.");
         }
     });
+    
 
     // Register Code Action Provider to enable Light Bulb suggestions
     const codeActionProvider = vscode.languages.registerCodeActionsProvider('*', {
