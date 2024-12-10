@@ -63,11 +63,15 @@ export async function testApiConnection(context: vscode.ExtensionContext): Promi
 
 // Check Grammar Function 
 export async function identifySpellingGrammarErrors(text: string, context: vscode.ExtensionContext): Promise<any | undefined> {
-    
     try {
+        // Ensure context is valid
+        if (!context || !context.secrets) {
+            vscode.window.showErrorMessage("Context is not properly initialized.");
+            return;
+        }
+
         // Retrieve the API key from SecretStorage
         const apiKey = await getApiKey(context);
-
         if (!apiKey) {
             vscode.window.showErrorMessage(
                 'No OpenAI API key found. Please set it using the "Nous: Set API Key" command.'
@@ -86,35 +90,30 @@ export async function identifySpellingGrammarErrors(text: string, context: vscod
             body: JSON.stringify({
                 model: 'gpt-4', // or 'gpt-3.5-turbo'
                 messages: [
-                    { role: 'system', content: `You are an assistant that identifies spelling and grammar errors.
-                        Instructions for indexing:
-                        1. The position is zero-based, with position 0 corresponding to the start of the first character of the text.
-                        2. Position 1 corresponds to the space between the first and second characters, and so on.
-                        3. The start_position is the index immediately before the first character of the error.
-                        4. The end_position is the index immediately after the last character of the error.
+                    { role: 'system', content: `
+                        You are an assistant that identifies spelling and grammar errors.
+                        Instructions:
+                        - Use zero-based indexing for positions.
+                        - start_position is the index before the first character of the error.
+                        - end_position is the index after the last character of the error.
+                        - Return results in JSON format only.
+                    `.trim() },
+                    { role: 'user', content: `
+                        Identify spelling and grammar errors in the following text. 
+                        Return them in JSON format with the structure:
+                        [
+                            {
+                                "error": "error text",
+                                "correction": "corrected text",
+                                "type": "spelling/grammar",
+                                "start_position": start_index,
+                                "end_position": end_index
+                            }
+                        ].
 
-                        For example, if the text is "The cat set on the mat." your response would identify the error between 8 and 11 because the count is "(0)T(1)h(2)e(3) (4)c(5)a(6)t(7) (8)s(9)a(10)t(11) on the mat.
-                        ` },
-                    { 
-                        role: 'user', 
-                        content: `
-                            Identify spelling and grammar errors in the following text. 
-                            Return them in JSON format with the structure: 
-                            [
-                                {
-                                    "error": "error text", 
-                                    "correction": "corrected text", 
-                                    "type": "spelling/grammar", 
-                                    "start_position": start_index, 
-                                    "end_position": end_index
-                                }
-                            ]. 
-                            
-                            Text:
-                            
-                            ${text}
-                        `
-                    },
+                        Text:
+                        ${text}
+                    `.trim() },
                 ],
                 max_tokens: 500,
                 temperature: 0.2,
@@ -128,15 +127,20 @@ export async function identifySpellingGrammarErrors(text: string, context: vscod
         }
 
         const data = await response.json();
-        const errors = data.choices[0].message.content.trim();
+        const errors = data.choices[0]?.message?.content?.trim();
 
-        // Parse JSON response from the API
-        try {
-            const errorList = JSON.parse(errors);
-            return errorList;
-        } catch (parseError) {
-            vscode.window.showErrorMessage("Failed to parse JSON response from the API.");
-            console.error("Error parsing JSON:", parseError);
+        if (errors.startsWith('[') && errors.endsWith(']')) {
+            try {
+                const errorList = JSON.parse(errors);
+                return errorList;
+            } catch (parseError) {
+                vscode.window.showErrorMessage("Failed to parse JSON response from the API.");
+                console.error("Error parsing JSON:", parseError);
+                return;
+            }
+        } else {
+            vscode.window.showErrorMessage("API response format is invalid.");
+            console.error("Invalid API response:", errors);
             return;
         }
     } catch (error) {

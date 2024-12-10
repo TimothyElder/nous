@@ -16,7 +16,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage("I'm Nous! Here to help you.");
     });
 
-    // Command to identify spelling and grammar errors
+    // Command to identify spelling and grammar errors, STRING MATCH
     const identifyErrorsCommand = vscode.commands.registerCommand('nous.identifyErrors', async () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
@@ -44,24 +44,29 @@ export function activate(context: vscode.ExtensionContext) {
             const grammarDecorations: vscode.DecorationOptions[] = [];
             errorRanges.length = 0; // Reset stored errors
     
-            for (const error of errors) {
-                
-                const start = editor.document.positionAt(selection.start.character + error.start_position);
-                console.log('Start Position Object:', start);
-                
-                const end = editor.document.positionAt(selection.start.character + error.end_position);
-                console.log('End Position Object:', end);
-                
-                const range = new vscode.Range(start, end);
-                console.log('Range of Position Object:', range);
+            let startSearch = 0; // Tracks where to start searching in the text for string matches
     
-                // Extract error text and correction
+            for (const error of errors) {
                 const errorText = error.error;          // Text with the error
-                console.log('Error text:', errorText);
-                
                 const errorCorrection = error.correction; // Suggested correction
-                console.log('Error correction:', errorCorrection);
-
+    
+                // Find the position of the error text in the selected text
+                const startOffset = selectedText.indexOf(errorText, startSearch);
+                if (startOffset === -1) {
+                    console.warn(`Error text not found in selection: ${errorText}`);
+                    continue; // Skip if the error text cannot be found
+                }
+    
+                // Calculate the range for the error
+                const endOffset = startOffset + errorText.length;
+                const start = editor.document.positionAt(selection.start.character + startOffset);
+                const end = editor.document.positionAt(selection.start.character + endOffset);
+                const range = new vscode.Range(start, end);
+    
+                // Update startSearch to avoid matching the same occurrence multiple times
+                startSearch = endOffset;
+    
+                // Create decoration for this error
                 const decoration: vscode.DecorationOptions = {
                     range,
                     hoverMessage: `Error: "${errorText}"\nCorrection: "${errorCorrection}"`,
@@ -76,6 +81,7 @@ export function activate(context: vscode.ExtensionContext) {
                 }
             }
     
+            // Apply decorations
             editor.setDecorations(spellingErrorDecoration, spellingDecorations);
             editor.setDecorations(grammarErrorDecoration, grammarDecorations);
     
@@ -119,25 +125,59 @@ export function activate(context: vscode.ExtensionContext) {
     const acceptCorrectionCommand = vscode.commands.registerCommand('nous.acceptCorrection', async (range: vscode.Range, correction: string, decorationType: vscode.TextEditorDecorationType) => {
         const editor = vscode.window.activeTextEditor;
         if (editor) {
+            const originalText = editor.document.getText(range);
+            const originalLength = originalText.length;
+            const newLength = correction.length;
+            const lengthDifference = newLength - originalLength;
+    
             await editor.edit(editBuilder => {
                 // Replace the entire range of the error with the correction
                 editBuilder.replace(range, correction);
             });
-            // Remove the decoration by updating to only show remaining errors
-            editor.setDecorations(decorationType, errorRanges.filter(e => !e.range.isEqual(range)).map(e => ({ range: e.range })));
+    
+            // Remove the corrected error from errorRanges
+            const errorIndex = errorRanges.findIndex(e => e.range.isEqual(range));
+            if (errorIndex !== -1) {
+                errorRanges.splice(errorIndex, 1);
+            }
+    
+            // Adjust ranges for remaining errors
+            errorRanges.forEach(err => {
+                if (err.range.start.isAfter(range.end)) {
+                    // Adjust ranges that are after the edited range
+                    err.range = new vscode.Range(
+                        editor.document.positionAt(editor.document.offsetAt(err.range.start) + lengthDifference),
+                        editor.document.positionAt(editor.document.offsetAt(err.range.end) + lengthDifference)
+                    );
+                }
+            });
+    
+            // Remove the decoration for the corrected error
+            editor.setDecorations(decorationType, errorRanges.map(e => ({ range: e.range })));
+    
             vscode.window.showInformationMessage(`Correction applied: ${correction}`);
         }
     });
+    
+    
 
     // Command to reject correction
     const rejectCorrectionCommand = vscode.commands.registerCommand('nous.rejectCorrection', (range: vscode.Range, decorationType: vscode.TextEditorDecorationType) => {
         const editor = vscode.window.activeTextEditor;
         if (editor) {
-            // Update decorations by removing the rejected suggestion
-            editor.setDecorations(decorationType, errorRanges.filter(e => !e.range.isEqual(range)).map(e => ({ range: e.range })));
+            // Remove the rejected error from errorRanges
+            const errorIndex = errorRanges.findIndex(e => e.range.isEqual(range));
+            if (errorIndex !== -1) {
+                errorRanges.splice(errorIndex, 1);
+            }
+    
+            // Clear the decoration for the rejected error
+            editor.setDecorations(decorationType, errorRanges.map(e => ({ range: e.range })));
+    
             vscode.window.showInformationMessage(`Suggestion rejected.`);
         }
     });
+    
 
     context.subscriptions.push(helloWorldCommand, removeNewlinesCommand, anonymizeCommand, compileMarkdownCommand,
                                identifyErrorsCommand, acceptCorrectionCommand, rejectCorrectionCommand);
