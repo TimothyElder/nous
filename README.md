@@ -33,13 +33,7 @@ For Windows it is probably best to install Nous from within VS Code with by clon
 
 ## Markdown Syntax
 
-Nous comes with some slight customizations to how markdown works. The standard behavior of comments in Markdown documents in VS Code is to only allow comments around complete lines of the document using `<!--  -->`. These can also be used inline, but are annoying to type. Nous includes inline comments that will leave text in the source but exclude it from compiled versions of the document. This can be helpful for qualitative researchers who want to exclude text from or around quotations without deleting it entirely. This can be helpful for editing long quotes or leaving in identifiers that help you tie quotations back to the respondents ID. This inline comment is used with double curly brackets `{{...}}`. Here is an example of how they can be used:
-
-```
-Dr. Potter, a palliative care attending in the Midwest descibes that:
-
->communication is our procedure...that has a level of expertise, the level of skill, level of protocol,{{ if you will,}} that may be similar, or different, but may have parallels to{{, you know,}} what a more traditional proceduralist, a vascular surgeon, a neurosurgeon might do. {{So I think that I think that does ring true that we,}} That is something we spend a lot of time on, that we have training in, we have an appreciation of, we enjoy doing it, for the most part, we have time to do it.{{ Right.}} There’s also an economy of time, right? That I will have more time than, you know, an internal medicine doctor who as eight different patients they need to see that afternoon. Whereas I have three patients I need to see for example. {{ PAL-PH/A-013 Midwest Male Attending }}
-```
+Nous comes with some slight customizations to how markdown works. The standard behavior of comments in Markdown documents in VS Code is to only allow comments around complete lines of the document using `<!--  -->`. These can also be used inline, but are annoying to type. Nous includes inline comments that will leave text in the source but exclude it from compiled versions of the document. This can be helpful for qualitative researchers who want to exclude text from or around quotations without deleting it entirely. This can be helpful for editing long quotes or leaving in identifiers that help you tie quotations back to the respondents ID. This inline comment is used with double curly brackets `{{...}}`.
 
 ## Plaintext Utilities
 
