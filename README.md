@@ -6,31 +6,6 @@ Some utilities included in Nous might be a little esoteric with a very narrow us
 
 Most importantly Nous includes a grammar and spell checker to help make your work more better! Using the OpenAI API for completions from their GPT models it will help to fix spelling and grammatical errors.
 
-## Installation 
-
-### macOS and Linux
-
-Ensure that the Visual Studio Code command-line tool is available:
-	
-1.	Open VS Code.
-2.	Press `Cmd+Shift+P` (or `Ctrl+Shift+P` on Linux) to open the Command Palette.
-3.	Type Shell Command: Install 'code' command in PATH and select it.
-4.	VS Code will add the code command to your shell’s PATH.
-
-After this step, the code command should be available in your terminal.
-
-5.	Restart your terminal to apply the changes.
-
-Then run the following code:
-```sh
-git clone https://github.com/TimothyElder/nous.git
-code --install-extension nous/dist/nous-0.0.1.vsix
-```
-
-### Windows
-
-For Windows it is probably best to install Nous from within VS Code with by cloning the repo (`git clone https://github.com/TimothyElder/nous.git`) and then with the command palette (`Cntrl+Shift+P`) running the command "Developer: Install Extension from Location..." and find the `.vsix` file in the `dist` directory of Nous.
-
 ## Enhanced Markdown Syntax
 
 Nous comes with some slight customizations to how markdown works. The standard behavior of comments in Markdown documents in VS Code is to only allow comments around complete lines of the document using `<!--  -->`. These can also be used inline, but are annoying to type. Nous includes inline comments that will leave text in the source but exclude it from compiled versions of the document. This can be helpful for qualitative researchers who want to exclude text from or around quotations without deleting it entirely. This can be helpful for editing long quotes or leaving in identifiers that help you tie quotations back to the respondents ID. This inline comment is used with double curly brackets `{{...}}`.
