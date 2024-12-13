@@ -5,8 +5,19 @@
       "properties": {
         "nous.openaiAPIkey": {
           "type": "string",
-          "default": null,
+          "default": "",
           "description": "Your OpenAI API key for making requests."
+        },
+        "nous.backend": {
+          "type": "string",
+          "enum": ["openai", "llama"],
+          "default": "openai",
+          "description": "Choose the backend for grammar and spelling checks."
+        },
+        "nous.llamaEndpoint": {
+          "type": "string",
+          "default": "http://localhost:11434/api/chat",
+          "description": "Endpoint for the locally hosted Llama 3.2 server."
         }
       }
     }

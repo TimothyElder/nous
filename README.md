@@ -1,4 +1,4 @@
-# Nous <img src='data/nous.png' align="right" height="138.5" /></a>
+# Nous <img src='data/anaxagoras.png' align="right" height="138.5" /></a>
 
 Nous is for researchers and writers who are doing their work using plain text files. These include Markdown, $\LaTeX$, RMarkdown, sweave and many more. Nous is meant to make your life easier by including compilation settings for pandoc and its extensions natively, so you don't have to go through the unfortunate process your self of setting up Makefiles or working on the command line when you are writing and compiling.
 

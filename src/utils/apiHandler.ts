@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import { getApiKey } from './keyHandler';
 
+const fetch = require('node-fetch');
+
 interface OpenAIResponse {
     choices: {
         message: {
