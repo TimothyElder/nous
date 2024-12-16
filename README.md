@@ -16,13 +16,17 @@ Further, Nous supports using the variable `$HOME`, in Markdown documents, in cas
 
 Nous also comes with a compilation tool chain for Markdown documents that will help you speed up compilation of documents. PDF, DOCX and HTML output are supported. `Cmd+Shift+P >` “Compile Markdown”
 
-## Grammar Checking with OpenAI Completion Models
+## Grammar and Spell Checking
 
 **In Development. Not Very Helpful Yet.**
 
-The grammar and spell checking feature of Nous uses OpenAI's completion models for feedback. You'll need an API key to OpenAI's API which can be securely entered into Nous's options through the command palette with the command `Cmd+Shift+P >` "Set API key". **Please note:** Your API key is securely stored locally using VS Code's secret storage function.
+The grammar and spell checking feature of Nous uses LLMs to find grammatical and spalling errors and offer suggestions. Nous supports making calls to two different endpoints: [OpenAI's API](https://platform.openai.com/docs/overview) or to a local installation of one of [Meta's Llama](https://www.llama.com/) models (3.2 to be specific). If using OpenAI, you'll need an API key to OpenAI's API which can be securely entered into Nous's options through the command palette with the command `Cmd+Shift+P >` "Set API key". **Please note:** Your API key is securely stored locally using VS Code's secret storage function.
+
+If using a local installation of Llama 3.2, you'll have to have the model isntalled. I suggest using [Ollama](https://ollama.com/) as it is very easy and makes the process painless. 
 
 The grammar and spell checker is currently designed only for use with Markdown files but will be developed to include plain text documents including $\LaTeX$, RMarkdown, etc. It currently has a 500 token limit that it is able to process at any given time, but the API can be called multiple times to achieve complete document coverage. Errors are meant to be highlighted as being either "grammatical" (green) or "spelling" (red). Quick fix actions (`Cmd + .`) are available to accept or reject suggested edits.
+
+**It is very buggy and has limited functionality right now but it is starting to work.**
 
 ## Plaintext Utilities
 

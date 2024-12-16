@@ -14,14 +14,9 @@
     "vscode": "^1.95.0"
   },
   "activationEvents": [
-    "onCommand:nous.helloWorld",
-    "onCommand:nous.removeNewlines",
-    "onCommand:nous.Anonymize",
-    "onCommand:nous.compileMarkdown",
-    "onCommand:nous.testApiConnection",
+    "onCommand:nous.setBackendCommand",
     "onCommand:nous.identifyErrors",
-    "onCommand:nous.acceptCorrection",
-    "onCommand:nous.rejectCorrection"
+    "onCommand:nous.testApiConnection"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -32,6 +27,17 @@
           "type": "string",
           "default": "",
           "description": "Your OpenAI API key for making requests. This is required for Nous to work."
+        },
+        "nous.backend": {
+          "type": "string",
+          "enum": ["openai", "llama"],
+          "default": "openai",
+          "description": "Choose the backend for grammar and spelling checks."
+        },
+        "nous.llamaEndpoint": {
+          "type": "string",
+          "default": "http://localhost:11434/api/chat",
+          "description": "Endpoint for the locally hosted Llama 3.2 server."
         }
       }
     },
@@ -73,31 +79,35 @@
     "commands": [
       {
         "command": "nous.removeNewlines",
-        "title": "Remove Newlines in Selection"
+        "title": "Nous: Remove Newlines in Selection"
       },
       {
         "command": "nous.Anonymize",
-        "title": "Replace Text with Underscores"
+        "title": "Nous: Replace Text with Underscores"
       },
       {
         "command": "nous.compileMarkdown",
-        "title": "Compile Markdown"
+        "title": "Nous: Compile Markdown"
       },
       {
         "command": "nous.testApiConnection",
-        "title": "Test API Connection"
+        "title": "Nous: Test API Connection"
       },
       {
         "command": "nous.identifyErrors",
-        "title": "Identify Spelling and Grammar Errors"
+        "title": "Nous: Identify Spelling and Grammar Errors"
       },
       {
         "command": "nous.acceptCorrection",
-        "title": "Accept Correction"
+        "title": "Nous: Accept Correction"
+      },
+      {
+        "command": "nous.setBackend",
+        "title": "Nous: Set Backend LLM"
       },
       {
         "command": "nous.rejectCorrection",
-        "title": "Reject Suggestion"
+        "title": "Nous: Reject Suggestion"
       },
       {
         "command": "nous.setApiKey",

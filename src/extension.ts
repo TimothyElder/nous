@@ -1,7 +1,5 @@
 import * as vscode from 'vscode';
-import * as child_process from 'child_process';
-import * as path from 'path';
-import { testApiConnection, identifySpellingGrammarErrors } from './utils/apiHandler';
+import { testApiConnection, identifySpellingGrammarErrors, setBackendCommand} from './utils/apiHandler';
 import { setApiKeyCommand, clearApiKeyCommand } from './utils/keyHandler';
 import { removeNewlinesCommand, anonymizeCommand, compileMarkdownCommand } from './utils/plaintextHelpers';
 
@@ -11,10 +9,9 @@ const errorRanges: { range: vscode.Range; correction: string; decorationType: vs
 export function activate(context: vscode.ExtensionContext) {
     console.log('Nous extension is now active!');
 
-    // Register commands
-    const helloWorldCommand = vscode.commands.registerCommand('nous.helloWorld', () => {
-        vscode.window.showInformationMessage("I'm Nous! Here to help you.");
-    });
+    context.subscriptions.push(
+        vscode.commands.registerCommand('nous.setBackend', setBackendCommand)
+    );
 
     // Command to identify spelling and grammar errors, STRING MATCH
     const identifyErrorsCommand = vscode.commands.registerCommand('nous.identifyErrors', async () => {
@@ -180,9 +177,14 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
     
-
-    context.subscriptions.push(helloWorldCommand, removeNewlinesCommand, anonymizeCommand, compileMarkdownCommand,
-                               identifyErrorsCommand, acceptCorrectionCommand, rejectCorrectionCommand);
+    context.subscriptions.push(
+        removeNewlinesCommand, 
+        anonymizeCommand, 
+        compileMarkdownCommand,
+        identifyErrorsCommand, 
+        acceptCorrectionCommand, 
+        rejectCorrectionCommand
+    );
     
     context.subscriptions.push(
         vscode.commands.registerCommand('nous.setApiKey', () => setApiKeyCommand(context))
