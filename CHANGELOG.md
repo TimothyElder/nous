@@ -1,11 +1,8 @@
 # Change Log
 
-All notable changes to the "nous" extension will be documented in this file.
-
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
-
 
 ## [0.0.1] - 2024-12-09
 
@@ -35,3 +32,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### Bug Fixes
 - Resolved indexing issue for grammar/spell checker: indexing begins at the start of document rather than start of selection. 
+
+## [0.1.5] - 2025-12-03
+
+### New Features
+- Llama LLM support for grammar and spell checking addded. 
+- Markdown compilation tool now respects YAML front matter including pdf, docx, and html formatting options, default options added.
