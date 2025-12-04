@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { testApiConnection, identifySpellingGrammarErrors, setBackendCommand} from './utils/apiHandler';
 import { setApiKeyCommand, clearApiKeyCommand } from './utils/keyHandler';
-import { removeNewlinesCommand, anonymizeCommand, compileMarkdownCommand } from './utils/plaintextHelpers';
+import { removeNewlinesCommand, anonymizeCommand } from './utils/plaintextHelpers';
+import { compileMarkdownCommand } from './compilation_tools/compileMarkdown';
 
 // Store error ranges globally for access across commands
 const errorRanges: { range: vscode.Range; correction: string; decorationType: vscode.TextEditorDecorationType }[] = [];
@@ -157,8 +158,6 @@ export function activate(context: vscode.ExtensionContext) {
             // vscode.window.showInformationMessage(`Correction applied: ${correction}`);
         }
     });
-    
-    
 
     // Command to reject correction
     const rejectCorrectionCommand = vscode.commands.registerCommand('nous.rejectCorrection', (range: vscode.Range, decorationType: vscode.TextEditorDecorationType) => {

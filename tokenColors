@@ -5,5 +5,19 @@
             "foreground": "#ADD8E6",
             "fontStyle": "italic"
         }
+    },
+    {
+        "scope": "meta.content.math.inline.markdown",
+        "settings": {
+            "foreground": "#98FB98",
+            "fontStyle": "italic"
+        }
+    },
+    {
+        "scope": "punctuation.definition.math.begin.markdown, punctuation.definition.math.end.markdown",
+        "settings": {
+            "foreground": "#90EE90",
+            "fontStyle": "italic"
+        }
     }
 ]
