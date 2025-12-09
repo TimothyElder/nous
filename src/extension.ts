@@ -4,6 +4,11 @@ import { setApiKeyCommand, clearApiKeyCommand } from './utils/keyHandler';
 import { removeNewlinesCommand, anonymizeCommand } from './utils/plaintextHelpers';
 import { compileMarkdownCommand } from './compilation_tools/compileMarkdown';
 
+import { Manager } from "./features/citations/components/manager";
+import { Completer } from "./features/citations/providers/completion";
+import { HoverProvider } from "./features/citations/providers/hover";
+import { DefinitionProvider } from "./features/citations/providers/definition";
+
 // Store error ranges globally for access across commands
 const errorRanges: { range: vscode.Range; correction: string; decorationType: vscode.TextEditorDecorationType }[] = [];
 
