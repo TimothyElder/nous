@@ -19,5 +19,42 @@
             "foreground": "#90EE90",
             "fontStyle": "italic"
         }
+    },
+
+    {
+    "scope": "entity.name.footnote.markdown",
+    "settings": {
+        "foreground": "#569CD6",
+        "fontStyle": "bold"
     }
+    },
+    {
+    "scope": "entity.name.footnote.definition.markdown",
+    "settings": {
+        "foreground": "#4EC9B0",
+        "fontStyle": "bold"
+    }
+    },
+    {
+    "scope": "punctuation.definition.footnote.markdown, punctuation.definition.footnote.colon.markdown, punctuation.definition.footnote.caret.markdown",
+    "settings": {
+        "foreground": "#858585"
+    }
+    },
+    {
+    "scope": "markup.footnote.content.markdown",
+    "settings": {
+        "foreground": "#9CDCFE",
+        "fontStyle": "italic"
+    }
+    },
+    {
+    "scope": "markup.footnote.inline.content.markdown",
+    "settings": {
+        "foreground": "#CE9178",
+        "fontStyle": "italic"
+    }
+    }
+
+
 ]

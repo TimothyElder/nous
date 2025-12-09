@@ -70,6 +70,57 @@ This command removes new line metacharacters from highlighted text in plaintext 
 
 This replaces highlighted characters with underscores, for moments when you are working with text that includes information you'd like to anonymize such as "Dr. John Smith" can become "Dr. ____ _____". `Cmd+Shift+P >` "Replace Text with Underscores".
 
+## Syntax Highlighting Recommendation
+
+```JSON
+"editor.tokenColorCustomizations": {
+  "textMateRules": [
+    {
+      "scope": "punctuation.definition.math.begin.markdown",
+      "settings": {
+        "foreground": "#1000c0",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": "punctuation.definition.math.end.markdown",
+      "settings": {
+        "foreground": "#1000c0",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": "markup.math.inline.markdown",
+      "settings": {
+        "foreground": "#c27ec4",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "scope": "meta.embedded.math.markdown",
+      "settings": {
+        "foreground": "#e2fb98",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "scope": "comment.block.curlybrackets",
+      "settings": {
+        "foreground": "#ADD8E6",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "scope": "markup.footnote.inline.markdown",
+      "settings": {
+        "foreground": "#d7a0e8",
+        "fontStyle": "italic"
+      }
+    }
+  ]
+}
+```
+
 ## Acknowledgments
 
 Nous incorporates citation autocomplete functionality from [PandocCiter](https://github.com/notZaki/PandocCiter) by notZaki, licensed under the MIT License.
