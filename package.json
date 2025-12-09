@@ -113,8 +113,8 @@
     },
     "grammars": [
       {
-        "scopeName": "markdown.footnote.injection",
-        "path": "./syntaxes/markdown-footnotes.injection.json",
+        "scopeName": "markdown.nous.injection",
+        "path": "./syntaxes/nous-markdown.injection.json",
         "injectTo": ["text.html.markdown"]
       },
       {
