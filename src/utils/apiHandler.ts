@@ -21,6 +21,9 @@ interface ApiError {
 }
 
     export async function setBackendCommand(): Promise<void> {
+        /**
+         * Choose which LLM used for spelling & grammar checking
+         */
         console.log('Registered command: nous.setBackend');
         const llms = ['openai', 'llama'];
         const backend = await vscode.window.showQuickPick(llms, {

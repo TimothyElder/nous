@@ -38,25 +38,44 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 
-import { Extension } from "../../extension";
+import { Citer } from "../../../../extension";
 import { bibtexParser } from "latex-utensils";
 
+/**
+ * Represents a citation suggestion with all its bibliographic data
+ */
 export interface Suggestion extends vscode.CompletionItem {
   key: string;
   documentation: string;
   fields: { [key: string]: string };
   file: string;
-  position: vscode.Position; // Unnecessary?
+  position: vscode.Position;
 }
 
+/**
+ * Manages citation entries from BibTeX and BibJSON files
+ * 
+ * Provides autocomplete suggestions for citations by parsing
+ * bibliography files and maintaining a cache of entries.
+ */
 export class Citation {
-  extension: Extension;
+  extension: Citer;
   private bibEntries: { [file: string]: Suggestion[] } = {};
 
-  constructor(extension: Extension) {
+  /**
+   * Creates a new Citation manager
+   * @param extension - Reference to the main Citer extension
+   */
+  constructor(extension: Citer) {
     this.extension = extension;
   }
 
+  /**
+   * Provides citation completion items for autocomplete
+   * 
+   * @param args - Optional context information about where completion was requested
+   * @returns Array of completion items for VS Code autocomplete
+   */
   provide(args?: {
     document: vscode.TextDocument;
     position: vscode.Position;
@@ -77,6 +96,11 @@ export class Citation {
     });
   }
 
+  /**
+   * Opens a quick pick menu to browse and insert citations
+   * 
+   * @param _args - Optional context information (currently unused)
+   */
   browser(_args?: {
     document: vscode.TextDocument;
     position: vscode.Position;
@@ -144,6 +168,11 @@ export class Citation {
       });
   }
 
+  /**
+   * Parses a bibliography file based on its extension
+   * 
+   * @param file - Path to the bibliography file (.bib or .json)
+   */
   parseBibFile(file: string) {
     const ext = path.extname(file);
     if (ext == ".bib") {
@@ -155,10 +184,15 @@ export class Citation {
     }
   }
 
+  /**
+   * Parses a BibJSON format bibliography file
+   * 
+   * @param file - Path to the .json file
+   */
   parseBibjsonFile(file: string) {
     const fields: string[] = (
       vscode.workspace
-        .getConfiguration("PandocCiter")
+        .getConfiguration("nous")
         .get("CitationFormat") as string[]
     ).map((f) => {
       return f.toLowerCase();
@@ -166,7 +200,9 @@ export class Citation {
     this.extension.log(`Parsing .bib entries from ${file}`);
     this.bibEntries[file] = [];
     let json = JSON.parse(fs.readFileSync(file, "utf-8"));
-    json.forEach((entry) => {
+    
+    // FIX: Add type annotation for entry parameter
+    json.forEach((entry: any) => {
       const item: Suggestion = {
         key: entry.id,
         label: entry.id,
@@ -177,7 +213,8 @@ export class Citation {
         fields: {},
       };
       if (entry.author) {
-        entry.author.forEach((element) => {
+        // FIX: Add type annotation for element parameter
+        entry.author.forEach((element: any) => {
           if (item.fields.author) {
             item.fields.author += " and ";
           } else {
@@ -187,7 +224,8 @@ export class Citation {
         });
         item.documentation += `author: ${item.fields.author}\n`;
       } else if (entry.editor) {
-        entry.editor.forEach((element) => {
+        // FIX: Add type annotation for element parameter
+        entry.editor.forEach((element: any) => {
           if (item.fields.editor) {
             item.fields.editor += " and ";
           } else {
@@ -218,10 +256,15 @@ export class Citation {
     );
   }
 
+  /**
+   * Parses a BibTeX format bibliography file
+   * 
+   * @param file - Path to the .bib file
+   */
   parseBibtexFile(file: string) {
     const fields: string[] = (
       vscode.workspace
-        .getConfiguration("PandocCiter")
+        .getConfiguration("nous")
         .get("CitationFormat") as string[]
     ).map((f) => {
       return f.toLowerCase();
@@ -269,16 +312,36 @@ export class Citation {
     );
   }
 
+  /**
+   * Retrieves a citation entry by its key
+   * 
+   * @param key - The citation key to search for
+   * @returns The suggestion object if found, undefined otherwise
+   */
   getEntry(key: string): Suggestion | undefined {
     const suggestions = this.updateAll();
     const entry = suggestions.find((elm) => elm.key === key);
     return entry;
   }
 
+  /**
+   * Removes curly braces from LaTeX field values
+   * 
+   * @param str - String with potential curly braces
+   * @returns String with braces removed
+   * @private
+   */
   private deParenthesis(str: string) {
     return str.replace(/{+([^\\{}]+)}+/g, "$1");
   }
 
+  /**
+   * Collects all citation suggestions from loaded bibliography files
+   * 
+   * @param bibFiles - Optional array of specific files to include
+   * @returns Array of all citation suggestions
+   * @private
+   */
   private updateAll(bibFiles?: string[]): Suggestion[] {
     let suggestions: Suggestion[] = [];
     // From bib files
@@ -292,19 +355,32 @@ export class Citation {
     return suggestions;
   }
 
+  /**
+   * Checks for duplicate citation keys and notifies the user
+   * 
+   * @param items - Array of citation suggestions to check
+   */
   checkForDuplicates(items: Suggestion[]) {
     const allKeys = items.map((items) => items.key);
     if (new Set(allKeys).size !== allKeys.length) {
       // Code from: https://stackoverflow.com/questions/840781/get-all-non-unique-values-i-e-duplicate-more-than-one-occurrence-in-an-array
-      const count = (keys) =>
-        keys.reduce((a, b) => Object.assign(a, { [b]: (a[b] || 0) + 1 }), {});
-      const duplicates = (dict) => Object.keys(dict).filter((a) => dict[a] > 1);
+      // FIX: Add type annotations for arrow function parameters
+      const count = (keys: string[]) =>
+        keys.reduce((a: any, b: string) => Object.assign(a, { [b]: (a[b] || 0) + 1 }), {});
+      const duplicates = (dict: any) => Object.keys(dict).filter((a) => dict[a] > 1);
       vscode.window.showInformationMessage(
         `Duplicate key(s): ${duplicates(count(allKeys))}`
       );
     }
   }
 
+  /**
+   * Removes parsed bibliography entries for a specific file
+   * 
+   * Called when a bibliography file is deleted or no longer in use
+   * 
+   * @param bibPath - Path to the bibliography file to forget
+   */
   forgetParsedBibItems(bibPath: string) {
     this.extension.log(`Forgetting parsed bib entries for ${bibPath}`);
     delete this.bibEntries[bibPath];

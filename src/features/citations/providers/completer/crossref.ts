@@ -33,11 +33,14 @@
 
 import { dirname, join } from "path";
 import * as vscode from "vscode";
-import { Extension } from "../../extension";
+import { Citer } from "../../../../extension";
 
 const foreSearchChars = 800;
 const tblPrintLines = 3;
 
+/**
+ * Context information for parsing cross-references
+ */
 interface ParseContext {
   lineMatch: RegExpExecArray;
   type: string;
@@ -45,8 +48,14 @@ interface ParseContext {
   doc: vscode.TextDocument;
 }
 
+/**
+ * Provides cross-reference completion for figures, tables, equations, sections, and listings
+ * 
+ * Parses markdown documents to find labeled elements (e.g., {#fig:example})
+ * and provides autocomplete suggestions for cross-referencing them.
+ */
 export class Crossref {
-  extension: Extension;
+  extension: Citer;
   lineRegex: RegExp;
   regexes: {
     fig: RegExp;
@@ -56,7 +65,11 @@ export class Crossref {
     lst: RegExp;
   };
 
-  constructor(extension: Extension) {
+  /**
+   * Creates a new Crossref provider
+   * @param extension - Reference to the main Citer extension
+   */
+  constructor(extension: Citer) {
     this.extension = extension;
     this.lineRegex = /.*\{.*#(fig|tbl|eq|sec|lst):(\w+).*\}.*/g;
     this.regexes = {
@@ -68,7 +81,13 @@ export class Crossref {
     };
   }
 
-  private parseFig(ctx: ParseContext): vscode.CompletionItem {
+  /**
+   * Parses a figure reference
+   * @param ctx - Parse context with match information
+   * @returns Completion item for the figure, or null if parsing fails
+   * @private
+   */
+  private parseFig(ctx: ParseContext): vscode.CompletionItem | null {
     let match = this.regexes.fig.exec(ctx.lineMatch.toString());
     if (!match) return null;
     const title = match[1];
@@ -83,7 +102,13 @@ export class Crossref {
     };
   }
 
-  private parseSec(ctx: ParseContext): vscode.CompletionItem {
+  /**
+   * Parses a section reference
+   * @param ctx - Parse context with match information
+   * @returns Completion item for the section, or null if parsing fails
+   * @private
+   */
+  private parseSec(ctx: ParseContext): vscode.CompletionItem | null {
     let match = this.regexes.sec.exec(ctx.lineMatch.toString());
     if (!match) return null;
     const title = match[1];
@@ -94,7 +119,13 @@ export class Crossref {
     };
   }
 
-  private parseTbl(ctx: ParseContext): vscode.CompletionItem {
+  /**
+   * Parses a table reference
+   * @param ctx - Parse context with match information
+   * @returns Completion item for the table, or null if parsing fails
+   * @private
+   */
+  private parseTbl(ctx: ParseContext): vscode.CompletionItem | null {
     let match = this.regexes.tbl.exec(ctx.lineMatch.toString());
     if (!match) return null;
     const title = match[1];
@@ -125,6 +156,13 @@ export class Crossref {
     };
   }
 
+  /**
+   * Parses a listing (code block) with normal match
+   * @param ctx - Parse context with match information
+   * @param _ - Regex match (unused)
+   * @returns Completion item for the listing
+   * @private
+   */
   private parseLstNormalMatch(
     ctx: ParseContext,
     _: RegExpExecArray
@@ -158,6 +196,13 @@ export class Crossref {
     };
   }
 
+  /**
+   * Parses a listing (code block) from a table match
+   * @param ctx - Parse context with match information
+   * @param match - Regex match containing the table data
+   * @returns Completion item for the listing
+   * @private
+   */
   private parseLstTableMatch(
     ctx: ParseContext,
     match: RegExpExecArray
@@ -193,7 +238,13 @@ export class Crossref {
     };
   }
 
-  private parseLst(ctx: ParseContext): vscode.CompletionItem {
+  /**
+   * Parses a listing (code block) reference
+   * @param ctx - Parse context with match information
+   * @returns Completion item for the listing, or null if parsing fails
+   * @private
+   */
+  private parseLst(ctx: ParseContext): vscode.CompletionItem | null {
     const normalMatch = this.regexes.lst.exec(ctx.lineMatch.toString());
     if (normalMatch) {
       return this.parseLstNormalMatch(ctx, normalMatch);
@@ -205,7 +256,13 @@ export class Crossref {
     return null;
   }
 
-  private parseEq(ctx: ParseContext): vscode.CompletionItem {
+  /**
+   * Parses an equation reference
+   * @param ctx - Parse context with match information
+   * @returns Completion item for the equation, or null if parsing fails
+   * @private
+   */
+  private parseEq(ctx: ParseContext): vscode.CompletionItem | null {
     let match = this.regexes.eq.exec(ctx.lineMatch.toString());
     if (!match) return null;
     const doc = ctx.doc.getText();
@@ -227,21 +284,38 @@ export class Crossref {
     };
   }
 
+  /**
+   * Provides cross-reference completion items
+   * 
+   * Scans the document for labeled elements and returns appropriate
+   * completion items based on the configured mode (full/minimal/none).
+   * 
+   * @param args - Optional document context
+   * @returns Array of completion items for cross-references
+   */
   provide(args?: { document: vscode.TextDocument }): vscode.CompletionItem[] {
+    // FIX: Check if args is defined
+    if (!args) {
+      return [];
+    }
+
     const mode: string = vscode.workspace
-      .getConfiguration("PandocCiter")
+      .getConfiguration("nous")
       .get("CrossRefMode", "full");
     if (mode === "none") return [];
 
-    const targets = [];
+    const targets: vscode.CompletionItem[] = [];
     let match: RegExpExecArray | null;
-    const parsers = {
+    
+    // FIX: Type the parsers object properly to allow string indexing
+    const parsers: { [key: string]: (ctx: ParseContext) => vscode.CompletionItem | null } = {
       fig: this.parseFig.bind(this),
       sec: this.parseSec.bind(this),
       tbl: this.parseTbl.bind(this),
       lst: this.parseLst.bind(this),
       eq: this.parseEq.bind(this),
     };
+    
     while ((match = this.lineRegex.exec(args.document.getText())) !== null) {
       const type = match[1];
       const label = match[2];
@@ -255,6 +329,7 @@ export class Crossref {
               label,
               doc: args.document,
             });
+            // FIX: Only push if item is not null
             if (item) {
               targets.push(item);
             }

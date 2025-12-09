@@ -37,16 +37,16 @@
 
 import * as vscode from "vscode";
 
-import { Extension } from "../extension";
+import { Citer } from "../../../extension";
 import { Citation } from "./completer/citation";
 import { Crossref } from "./completer/crossref";
 
 export class Completer implements vscode.CompletionItemProvider {
-  extension: Extension;
+  extension: Citer;
   citation: Citation;
   crossref: Crossref;
 
-  constructor(extension: Extension) {
+  constructor(extension: Citer) {
     this.extension = extension;
     this.citation = new Citation(extension);
     this.crossref = new Crossref(extension);
@@ -72,7 +72,7 @@ export class Completer implements vscode.CompletionItemProvider {
     );
     this.extension.log(`Showing ${suggestions.length} suggestions`);
     if (suggestions.length > 0) {
-      const configuration = vscode.workspace.getConfiguration("PandocCiter");
+      const configuration = vscode.workspace.getConfiguration("nous");
       if ((configuration.get("ViewType") as string) === "browser") {
         setTimeout(() => this.citation.browser(), 10);
         return;

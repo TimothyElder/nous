@@ -6,5 +6,4 @@ node_modules
 .APIKEY
 SECRET
 .vscode
-package-lock.json
 .sync-exclude.lst

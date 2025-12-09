@@ -160,7 +160,7 @@ export function activate(context: vscode.ExtensionContext) {
             // Remove the decoration for the corrected error
             editor.setDecorations(decorationType, errorRanges.map(e => ({ range: e.range })));
     
-            // vscode.window.showInformationMessage(`Correction applied: ${correction}`);
+            vscode.window.showInformationMessage(`Correction applied: ${correction}`);
         }
     });
 
@@ -180,6 +180,62 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showInformationMessage(`Suggestion rejected.`);
         }
     });
+
+    // CITATION MANAGER STUFF
+    const extension = new Citer();
+
+    context.subscriptions.push(
+        vscode.workspace.onDidOpenTextDocument(() => {
+        extension.log("Reacting to document open");
+        if (vscode.window.activeTextEditor) {
+            extension.manager.findBib();
+        }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.window.onDidChangeActiveTextEditor(() => {
+          extension.log("Reacting to active document change");
+          if (
+            vscode.window.activeTextEditor &&
+            ["markdown", "rmd", "pweave_md"].includes(
+              vscode.window.activeTextEditor.document.languageId
+            )
+          ) {
+            extension.manager.findBib();
+          }
+        })
+      );
+    
+      context.subscriptions.push(
+        vscode.workspace.onDidSaveTextDocument(() => {
+          extension.log("Reacting to document save");
+          if (vscode.window.activeTextEditor) {
+            extension.manager.findBib();
+          }
+        })
+      );
+    
+      const selector = ["markdown", "rmd", "pweave_md", "quarto"].map(
+        (language) => {
+          return { scheme: "file", language: language };
+        }
+      );
+    
+      extension.manager.findBib();
+      context.subscriptions.push(
+        vscode.languages.registerCompletionItemProvider(
+          selector,
+          extension.completer,
+          "@"
+        )
+      );
+      context.subscriptions.push(
+        vscode.languages.registerHoverProvider(selector, extension.hover)
+      );
+      context.subscriptions.push(
+        vscode.languages.registerDefinitionProvider(selector, extension.definition)
+      );
     
     context.subscriptions.push(
         removeNewlinesCommand, 
@@ -203,5 +259,31 @@ export function activate(context: vscode.ExtensionContext) {
         })
     );
 }
+
+export class Citer {
+    manager: Manager;
+    completer: Completer;
+    hover: HoverProvider;
+    definition: DefinitionProvider;
+    logPanel: vscode.OutputChannel;
+  
+    constructor() {
+      this.manager = new Manager(this);
+      this.completer = new Completer(this);
+      this.hover = new HoverProvider(this);
+      this.definition = new DefinitionProvider(this);
+      this.logPanel = vscode.window.createOutputChannel("nousCiter");
+      this.log(`nousCiter is now activated`);
+    }
+  
+    log(msg: string) {
+      // Log to both console and output panel for easier debugging
+      console.log(`[nousCiter] ${msg}`);
+      const showLog = vscode.workspace.getConfiguration("nous").get("ShowLog", true);
+      if (showLog) {
+        this.logPanel.append(`${msg}\n`);
+      }
+    }
+  }
 
 export function deactivate() {}

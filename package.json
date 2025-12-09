@@ -42,6 +42,72 @@
           "type": "string",
           "default": "http://localhost:11434/api/chat",
           "description": "Endpoint for the locally hosted Llama 3.2 server."
+        },
+        "nous.ViewType": {
+          "type": "string",
+          "enum": [
+            "inline",
+            "browser"
+          ],
+          "default": "inline",
+          "description": "How citation completions are shown"
+        },
+        "nous.RootFile": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "Main document containing YAML for bibliography"
+        },
+        "nous.ShowLog": {
+          "type": "boolean",
+          "default": true,
+          "description": "Should log be shown in Output panel"
+        },
+        "nous.DefaultBib": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "Path to default bib file"
+        },
+        "nous.DefaultBibs": {
+          "type": "array",
+          "default": [],
+          "scope": "resource",
+          "description": "Path to default bib files"
+        },
+        "nous.UseDefaultBib": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Whether to use the Default Bib"
+        },
+        "nous.ForgetUnusedBib": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to forget bib file when changing documents"
+        },
+        "nous.CitationFormat": {
+          "type": "array",
+          "default": [
+            "author",
+            "title",
+            "journal",
+            "container-title",
+            "publisher",
+            "booktitle",
+            "year"
+          ],
+          "description": "List of fields displayed in preview"
+        },
+        "nous.CrossRefMode": {
+          "type": "string",
+          "default": "full",
+          "description": "The features of CrossRef functionalities to enable",
+          "enum": [
+            "full",
+            "minimal",
+            "none"
+          ]
         }
       }
     },
@@ -149,6 +215,7 @@
   },
   "dependencies": {
     "js-yaml": "^4.1.1",
+    "latex-utensils": "^6.2.0",
     "node-fetch": "^2.7.0",
     "openai": "^4.73.0",
     "whatwg-url": "^14.0.0"

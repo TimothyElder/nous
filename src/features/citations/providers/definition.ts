@@ -10,12 +10,12 @@
  */
 
 import * as vscode from "vscode";
-import { Extension } from "../extension";
+import { Citer } from "../../../extension";
 
 export class DefinitionProvider implements vscode.DefinitionProvider {
-  extension: Extension;
+  extension: Citer;
 
-  constructor(extension: Extension) {
+  constructor(extension: Citer) {
     this.extension = extension;
   }
 
