@@ -109,13 +109,88 @@
             "none"
           ]
         }
-      }
+      },
+      "nousCiter.ViewType": {
+          "type": "string",
+          "enum": [
+            "inline",
+            "browser"
+          ],
+          "default": "inline",
+          "description": "How citation completions are shown"
+        },
+        "nousCiter.RootFile": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "Main document containing YAML for bibliography"
+        },
+        "nousCiter.ShowLog": {
+          "type": "boolean",
+          "default": false,
+          "description": "Should log be shown in Output panel"
+        },
+        "nousCiter.DefaultBib": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "Path to default bib file"
+        },
+        "nousCiter.DefaultBibs": {
+          "type": "array",
+          "default": [],
+          "scope": "resource",
+          "description": "Path to default bib files"
+        },
+        "nousCiter.UseDefaultBib": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Whether to use the Default Bib"
+        },
+        "nousCiter.ForgetUnusedBib": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to forget bib file when changing documents"
+        },
+        "nousCiter.CitationFormat": {
+          "type": "array",
+          "default": [
+            "author",
+            "title",
+            "journal",
+            "container-title",
+            "publisher",
+            "booktitle",
+            "year"
+          ],
+          "description": "List of fields displayed in preview"
+        },
+        "nousCiter.CrossRefMode": {
+          "type": "string",
+          "default": "full",
+          "description": "The features of CrossRef functionalities to enable",
+          "enum": [
+            "full",
+            "minimal",
+            "none"
+          ]
+        }
     },
     "grammars": [
       {
-        "language": "markdown",
-        "scopeName": "text.html.markdown",
-        "path": "./syntaxes/markdown.tmLanguage.json"
+        "scopeName": "markdown.nous.injection",
+        "path": "./syntaxes/nous-markdown.injection.json",
+        "injectTo": ["text.html.markdown"]
+      },
+      {
+        "injectTo": [
+          "text.html.markdown",
+          "text.html.markdown.redcarpet",
+          "source.pweave.md"
+        ],
+        "scopeName": "pandoc-citation",
+        "path": "./syntaxes/citations.json"
       }
     ],
     "languages": [
@@ -131,21 +206,6 @@
         "configuration": "./language-configuration.json"
       }
     ],
-    "configurationDefaults": {
-      "[markdown]": {
-        "editor.tokenColorCustomizations": {
-          "textMateRules": [
-            {
-              "scope": "comment.block.curlybrackets",
-              "settings": {
-                "foreground": "#ADD8E6",
-                "fontStyle": "italic"
-              }
-            }
-          ]
-        }
-      }
-    },
     "commands": [
       {
         "command": "nous.removeNewlines",
