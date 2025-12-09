@@ -1,0 +1,39 @@
+/**
+ * Citation autocomplete functionality
+ * 
+ * Adapted from PandocCiter by notZaki
+ * https://github.com/notZaki/PandocCiter
+ * Copyright (c) 2018 notZaki
+ * Licensed under the MIT License
+ * 
+ * Modified for integration with Nous extension
+ */
+
+import * as vscode from "vscode";
+import { Citer } from "../../../extension";
+
+export class DefinitionProvider implements vscode.DefinitionProvider {
+  extension: Citer;
+
+  constructor(extension: Citer) {
+    this.extension = extension;
+  }
+
+  provideDefinition(
+    document: vscode.TextDocument,
+    position: vscode.Position
+  ): vscode.Location | undefined {
+    // a cite key is an @ symbol followed by word characters (letters or numbers)
+    const keyRange = document.getWordRangeAtPosition(
+      position,
+      /(?<=@)[\w\p{L}\p{M}]+/u
+    );
+    if (keyRange) {
+      const citeKey = document.getText(keyRange);
+      const cite = this.extension.completer.citation.getEntry(citeKey);
+      if (cite) {
+        return new vscode.Location(vscode.Uri.file(cite.file), cite.position);
+      }
+    }
+  }
+}
