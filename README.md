@@ -2,7 +2,7 @@
 
 Nous is for researchers and writers who are doing their work using plain text files, particularly Markdown. Nous is meant to make your life easier by including compilation settings for [`pandoc`](https://pandoc.org/) and its extensions natively, so you don't have to go through the unfortunate process your self of setting up Makefiles or working on the command line when you are writing and compiling.
 
-Some utilities included in Nous might be a little esoteric with a very narrow use case, largely derived from my own specific workflow, but I include them anyway. If you are a qualitative social scientist who also does computational work and have made the unfortunate decision to commit yourself to working with plain text files nearly exclusively, then this extension is for you.
+{{Some utilities included in Nous might be a little esoteric with a very narrow use case, largely derived from my own specific workflow,}} but I include them anyway. If you are a qualitative social scientist who also does computational work and have made^[the unfortunate decision to commit yourself to working with plain text files nearly exclusively, then this extension is for you.]
 
 ## Installation
 

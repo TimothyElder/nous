@@ -278,6 +278,7 @@
     "latex-utensils": "^6.2.0",
     "node-fetch": "^2.7.0",
     "openai": "^4.73.0",
-    "whatwg-url": "^14.0.0"
+    "whatwg-url": "^14.0.0",
+    "chokidar": "^3.5.3"
   }
 }
